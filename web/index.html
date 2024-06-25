@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planejador Financeiro</title>
+    <!-- Importando o SDK Modular do Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.6/firebase-auth.js";
+
+        // Configurações do Firebase
+        var firebaseConfig = {
+            databaseURL: "https://planejador-financeiro-6f09a-default-rtdb.firebaseio.com/",
+            projectId: "634528777786",
+            appId: "planejador-financeiro-6f09a"
+        };
+
+        // Inicializando o Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const database = getDatabase(firebaseApp);
+        const transactionsRef = ref(database, 'transactions');
+
+        // Tornar referências e funções do Firebase disponíveis globalmente
+        window.database = database;
+        window.transactionsRef = transactionsRef;
+        window.push = push;
+        window.set = set;
+        window.onValue = onValue;
+
+        // Função para buscar e exibir todas as transações
+        window.buscarTransacoes = function() {
+            onValue(transactionsRef, snapshot => {
+                var listaTransacoes = document.getElementById('lista-transacoes');
+                listaTransacoes.innerHTML = '<h2>Lista de Transações</h2>';
+                snapshot.forEach(childSnapshot => {
+                    var transacao = childSnapshot.val();
+                    var transacaoHTML = `
+                        <div class="item-transacao">
+                            <p><strong>Descrição:</strong> ${transacao.description}</p>
+                            <p><strong>Valor:</strong> ${transacao.amount}</p>
+                            <p><strong>Data:</strong> ${transacao.date}</p>
+                            <p><strong>Categoria:</strong> ${transacao.category}</p>
+                        </div>
+                    `;
+                    listaTransacoes.innerHTML += transacaoHTML;
+                });
+            });
+        };
+
+        // Chamar buscarTransacoes inicialmente para carregar as transações existentes
+        buscarTransacoes();
+    </script>
+
+    <style>
+        /* Estilos básicos para o layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .item-transacao {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .formulario-transacao label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .formulario-transacao input,
+        .formulario-transacao select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .formulario-transacao button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Planejador Financeiro</h1>
+        <div class="formulario-transacao">
+            <h2>Adicionar Nova Transação</h2>
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" placeholder="Digite a descrição" required>
+            <label for="valor">Valor:</label>
+            <input type="number" id="valor" placeholder="Digite o valor" required>
+            <label for="data">Data:</label>
+            <input type="date" id="data" required>
+            <label for="categoria">Categoria:</label>
+            <select id="categoria" required>
+                <option value="Receber">Renda</option>
+                <option value="Pagar">Despesa</option>
+            </select>
+            <button onclick="adicionarTransacao()">Adicionar Transação</button>
+        </div>
+        <hr>
+        <div id="lista-transacoes">
+            <h2>Lista de Transações</h2>
+            <!-- Aqui serão listadas as transações -->
+        </div>
+    </div>
+
+    <script>
+        // Função para adicionar uma nova transação
+        function adicionarTransacao() {
+            var descricao = document.getElementById('descricao').value;
+            var valor = parseFloat(document.getElementById('valor').value);
+            var data = document.getElementById('data').value;
+            var categoria = document.getElementById('categoria').value;
+
+            if (!descricao || isNaN(valor) || !data || !categoria) {
+                alert("Preencha todos os campos!");
+                return;
+            }
+
+            // Adicionar nova transação ao banco de dados
+            const novaTransacaoRef = push(transactionsRef);
+            set(novaTransacaoRef, {
+                description: descricao,
+                amount: valor,
+                date: data,
+                category: categoria
+            }).then(() => {
+                // Limpar campos do formulário
+                document.getElementById('descricao').value = '';
+                document.getElementById('valor').value = '';
+                document.getElementById('data').value = '';
+
+                // Atualizar a lista de transações
+                buscarTransacoes();
+            }).catch(error => {
+                console.error('Erro ao adicionar transação:', error);
+            });
+        }
+
+        // Tornar a função adicionarTransacao disponível no escopo global
+        window.adicionarTransacao = adicionarTransacao;
+    </script>
+</body>
+</html>
