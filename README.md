@@ -24,5 +24,5 @@ Uma aplicação Flutter para gerenciar transações financeiras. A aplicação p
 
 1. Clone o repositório:
    ```bash
-   git clone <URL-do-repositório>
+   git clone <https://github.com/EmanuelSpinato/planejador_financeiro.git>
    cd planejador_financeiro
