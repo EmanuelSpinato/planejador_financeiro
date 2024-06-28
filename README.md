@@ -29,3 +29,9 @@ Uma aplicação Flutter para gerenciar transações financeiras. A aplicação p
 
 ### Tela de execução do sistema
 ![image](https://github.com/EmanuelSpinato/planejador_financeiro/assets/108852799/651a771d-891b-436c-8809-8229d8b7fc78)
+
+## Vídeos Explicativos
+
+- [Parte 1](https://youtu.be/0Jpo4Lbe-lw)
+- [Parte 2](https://youtu.be/LNXGyOTGzuE)
+- [Parte 3](https://youtu.be/mNooH0fgdQo)
